@@ -187,7 +187,7 @@ async function computeVersion(
 
   const allVersions = await fetchVersions(includePreReleases, repoToken);
   const validVersions = allVersions.filter(v => semver.valid(v) || semver.valid(normalizeVersion(v).slice(1)));
-  const possibleVersions = validVersions.filter(v => v.startsWith(version) || normalizeVersion(v).slice(1).startsWith(version));
+  const possibleVersions = validVersions.filter(v => v.startsWith(version) || normalizeVersion(v).startsWith(normalizeVersion(version)));
 
   const versionMap = new Map();
   possibleVersions.forEach(v => versionMap.set(normalizeVersion(v), v));
@@ -209,6 +209,9 @@ async function computeVersion(
 
 // Make partial versions semver compliant.
 function normalizeVersion(version: string): string {
+  if (version.startsWith("v")) {
+    version = version.slice(1);
+  }
   const preStrings = ["beta", "rc", "preview"];
 
   const versionPart = version.split(".");
@@ -233,7 +236,7 @@ function normalizeVersion(version: string): string {
     //append patch version if not available
     // e.g. 2.1 -> 2.1.0
     if (versionPart[0].match("[3-9]|[1-9][0-9]+")) {
-      return "v3.".concat(version.slice(1))
+      return "3.".concat(version)
     } else {
       return version.concat(".0");
     }
@@ -249,7 +252,7 @@ function normalizeVersion(version: string): string {
     }
   }
 
-  return version;
+  return "v".concat(version);
 }
 
 function includePrerelease(
