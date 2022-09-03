@@ -186,7 +186,7 @@ async function computeVersion(
   }
 
   const allVersions = await fetchVersions(includePreReleases, repoToken);
-  const validVersions = allVersions.filter(v => semver.valid(v));
+  const validVersions = allVersions.filter(v => semver.valid(v) || semver.valid(normalizeVersion(v)));
   const possibleVersions = validVersions.filter(v => v.startsWith(version));
 
   const versionMap = new Map();
@@ -232,7 +232,11 @@ function normalizeVersion(version: string): string {
   if (versionPart[2] == null) {
     //append patch version if not available
     // e.g. 2.1 -> 2.1.0
-    return version.concat(".0");
+    if (versionPart[0].match("[3-9]|[1-9][0-9]+")) {
+      return "v3.".concat(version.slice(1))
+    } else {
+      return version.concat(".0");
+    }
   } else {
     // handle beta and rc
     // e.g. 1.8.5beta1 -> 1.8.5-beta1, 1.8.5rc1 -> 1.8.5-rc1
