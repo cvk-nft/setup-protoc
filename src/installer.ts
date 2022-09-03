@@ -187,7 +187,7 @@ async function computeVersion(
 
   const allVersions = await fetchVersions(includePreReleases, repoToken);
   const validVersions = allVersions.filter(v => semver.valid(v) || semver.valid(normalizeVersion(v).slice(1)));
-  const possibleVersions = validVersions.filter(v => v.startsWith(version) || v.startsWith(normalizeVersion(version).slice(1)));
+  const possibleVersions = validVersions.filter(v => v.startsWith(version) || normalizeVersion(v).slice(1).startsWith(version));
 
   const versionMap = new Map();
   possibleVersions.forEach(v => versionMap.set(normalizeVersion(v), v));
@@ -199,7 +199,7 @@ async function computeVersion(
   core.debug(`evaluating ${versions.length} versions`);
 
   if (versions.length === 0) {
-    throw new Error("unable to get latest version");
+    throw new Error("unable to get latest version (" + version + " or " + normalizeVersion(version) + ")");
   }
 
   core.debug(`matched: ${versions[0]}`);
