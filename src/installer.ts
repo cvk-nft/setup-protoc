@@ -186,7 +186,7 @@ async function computeVersion(
   }
 
   const allVersions = await fetchVersions(includePreReleases, repoToken);
-  const validVersions = allVersions.filter(v => semver.valid(v) || semver.valid(normalizeVersion(v).slice(1)));
+  const validVersions = allVersions.filter(v => semver.valid(v) || semver.valid(normalizeVersion(v)));
   const possibleVersions = validVersions.filter(v => v.startsWith(version) || normalizeVersion(v).startsWith(normalizeVersion(version)));
 
   const versionMap = new Map();
@@ -252,7 +252,7 @@ function normalizeVersion(version: string): string {
     }
   }
 
-  return "v".concat(version);
+  return version;
 }
 
 function includePrerelease(
